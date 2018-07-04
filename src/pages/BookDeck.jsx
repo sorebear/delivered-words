@@ -36,11 +36,11 @@ class BookDeck extends Component {
 
   isSpaceEnabled(space, index) {
     const { board } = this.props;
-    return (space.type === 'bookstore' && board.playerLocation.player1 === null) ||
-    index === (board.playerLocation.player1 + 1) % 8 ||
-    index === (board.playerLocation.player1 + 2) % 8 ||
-    index === (board.playerLocation.player1 + 3) % 8 ||
-    index === (board.playerLocation.player1 + 4) % 8;
+    return (space.type === 'bookstore' && board.playerLocation[board.activePlayer] === null) ||
+    index === (board.playerLocation[board.activePlayer] + 1) % 8 ||
+    index === (board.playerLocation[board.activePlayer] + 2) % 8 ||
+    index === (board.playerLocation[board.activePlayer] + 3) % 8 ||
+    index === (board.playerLocation[board.activePlayer] + 4) % 8;
   }
 
   renderBookstoreInfo(space) {
@@ -68,7 +68,7 @@ class BookDeck extends Component {
           >
             { space.type }
             { space.playersOnSpace.length ? (
-              <div className={`player player1`}>
+              <div className={`player ${board.activePlayer}`}>
                 { space.playersOnSpace }
               </div>
             ) : ''}
@@ -83,7 +83,7 @@ class BookDeck extends Component {
     })
   }
 
-  renderCards() {
+  renderDrawDeck() {
     return this.props.bookDeck.draw.map((book, index) => (
       <li key={book.id}>{book.type}</li>
     ))
@@ -117,13 +117,13 @@ class BookDeck extends Component {
   }
 
   isCardInBookstore(book) {
-    const { spaces, playerLocation } = this.props.board;
-    return spaces[playerLocation['player1']].genres.includes(book.type);
+    const { spaces, playerLocation, activePlayer } = this.props.board;
+    return spaces[playerLocation[activePlayer]].genres.includes(book.type);
   }
 
   isBookstoreSpace() {
-    const { spaces, playerLocation } = this.props.board;
-    return spaces[playerLocation['player1']].type === 'bookstore';
+    const { spaces, playerLocation, activePlayer } = this.props.board;
+    return spaces[playerLocation[activePlayer]].type === 'bookstore';
   }
 
   isThereAPair(typeId) {
@@ -178,7 +178,7 @@ class BookDeck extends Component {
           <div className="card-stack">
             <h2>Draw Deck</h2>
             <ol>
-              { this.renderCards() }
+              { this.renderDrawDeck() }
             </ol>
           </div>
           <div className="card-stack">
