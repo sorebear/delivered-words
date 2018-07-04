@@ -1,0 +1,14 @@
+.cards {
+  display: flex;
+  justify-content: space-between;
+
+  .card-stack {
+
+    .player-card {
+
+      &.require-pair {
+        background-color: red;
+      }
+    }
+  }
+}

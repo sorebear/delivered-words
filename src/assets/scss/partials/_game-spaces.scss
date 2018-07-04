@@ -1,0 +1,25 @@
+.game-spaces {
+  display: flex;
+  justify-content: space-between;
+
+  .game-space {
+    height: 100px;
+    width: 100px;
+    text-transform: capitalize;
+  }
+
+  .town-space {
+    background-color: skyblue;
+  }
+
+  .bookstore-space {
+    background-color: hotpink;
+  }
+
+  .player {
+    background-color: white;
+    color: black;
+    margin-top: 5px;
+    padding: 5px;
+  }
+}
