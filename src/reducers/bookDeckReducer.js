@@ -1,7 +1,7 @@
 import bookDeck from '../data/bookDeck';
 import types from '../actions/types';
 
-const drawDeck = bookDeck.sort((a, b) => 0.5 - Math.random());
+const drawDeck = bookDeck.sort(() => 0.5 - Math.random());
 
 const DEFAULT_STATE = { 
   discard: [],
@@ -24,12 +24,20 @@ export default (state = DEFAULT_STATE, action) => {
         discard: action.payload.discard 
       }
     case (types.REVEAL_BOOK_DECK_CARD):
-      return { ...state, draw: action.payload.draw.slice(1) }
+      return { 
+        ...state, 
+        draw: action.payload.draw }
     case (types.PLAYER_TAKE_AVAILABLE_CARD):
       return { 
         ...state, 
         available: action.payload.available, 
         handPlayer1: action.payload.handPlayer1 
+      }
+    case (types.PLAYER_DRAW_TOP_CARD):
+      return {
+        ...state,
+        draw: action.payload.draw,
+        handPlayer1: action.payload.handPlayer1
       }
     case (types.DISCARD_BOOK_CARD):
       return { 

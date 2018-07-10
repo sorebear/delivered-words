@@ -1,58 +1,96 @@
 import types from './types';
 
 export function shuffleDiscardPile(books) {
-  const newBooks = { ...books }
-  newBooks.draw = [...newBooks.discard.sort((a, b) => 0.5 - Math.random()) ];
-  newBooks.discard = [];
+  const draw = [...books.discard.sort(() => 0.5 - Math.random()) ];
+  const discard = [];
   return {
     type: types.SHUFFLE_DISCARD_PILE,
-    payload: newBooks
+    payload: { draw, discard }
   }
 }
 
 export function playerTakeAvailableCard(books, index) {
-  const newBooks = { ...books };
-  newBooks.handPlayer1.push({ ...newBooks.available[index] });
-  newBooks.handPlayer1.sort((a, b) => ( 
+  const { handPlayer1, available } = books;
+  handPlayer1.push({ ...available[index] });
+  handPlayer1.sort((a, b) => ( 
     a.type === b.type ? 0 : a.type < b.type ? -1 : 1
   ));
-  newBooks.available[index] = null;
+  available[index] = null;
   return {
     type: types.PLAYER_TAKE_AVAILABLE_CARD,
-    payload: newBooks
+    payload: { handPlayer1, available }
+  }
+}
+
+export function playerDrawTopCard(books, index) {
+  const draw = books.draw.slice(1);
+  const { handPlayer1 } = books;
+  handPlayer1.push(books.draw[0]);
+  handPlayer1.sort((a, b) => ( 
+    a.type === b.type ? 0 : a.type < b.type ? -1 : 1
+  ));
+  return {
+    type: types.PLAYER_DRAW_TOP_CARD,
+    payload: { draw, handPlayer1 }
   }
 }
 
 export function revealBookDeckCard(books, index) {
-  const newBooks = { ...books };
-  newBooks.available[index] = newBooks.draw[0];
+  const { available } = books;
+  available[index] = books.draw[0];
+  const draw = books.draw.slice(1);
   return {
     type: types.REVEAL_BOOK_DECK_CARD,
-    payload: newBooks
+    payload: { available, draw }
   }
 }
 
 export function discardBookCard(books, index) {
-  const newBooks = { ...books };
-  newBooks.discard.push({...newBooks.handPlayer1[index]});
-  newBooks.handPlayer1.splice(index, 1);
+  const { discard, handPlayer1 } = books;
+  discard.push({...handPlayer1[index]});
+  handPlayer1.splice(index, 1);
   return {
     type: types.DISCARD_BOOK_CARD,
-    payload: newBooks
+    payload: { discard, handPlayer1 }
+  }
+}
+
+export function obtainBook(board, book) {
+  const { activePlayer, players } = board;
+  players[activePlayer].inventory.push(book);
+  return {
+    type: types.OBTAIN_BOOK,
+    payload: { players }
+  }
+}
+
+export function deliverBook(board, book, currentScore, index) {
+  const { spaces, players, activePlayer } = board;
+  const { location, score, inventory } = players[activePlayer];
+  // const score = parseInt(players[activePlayer].score);
+  const newScore = spaces[location].genres.hasOwnProperty(book.type) ?
+    currentScore + spaces[location].genres[book.type] :
+    currentScore + 1
+  // const newPlayerObj = { score: newScore, location, inventory };
+  // players[activePlayer] = newPlayerObj;
+  players[activePlayer].score = newScore;
+  console.log('PLAYERS:', players);
+  return {
+    type: types.DELIVER_BOOK,
+    payload: { players }
   }
 }
 
 export function movePlayer(board, spaceIndex) {
-  const newBoard = { ...board };
-  const { spaces, playerLocation } = newBoard;
-  if (playerLocation['player1']) {
-    const oldIndex = playerLocation['player1'];
-    spaces[oldIndex].playersOnSpace.splice(spaces[oldIndex].playersOnSpace.indexOf('player1'), 1);
+  const { spaces, players, activePlayer } = board;
+  if (players[activePlayer].location !== null) {
+    const oldIndex = players[activePlayer].location;
+    spaces[oldIndex].playersOnSpace.splice(spaces[oldIndex].playersOnSpace.indexOf(activePlayer), 1);
   }
-  playerLocation['player1'] = spaceIndex;
-  spaces[spaceIndex].playersOnSpace.push('player1');
+  players[activePlayer].location = spaceIndex;
+  spaces[spaceIndex].playersOnSpace.push(activePlayer);
   return {
     type: types.MOVE_PLAYER,
-    payload: newBoard
+    payload: { spaces, players }
   }
 }

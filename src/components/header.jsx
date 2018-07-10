@@ -1,7 +1,8 @@
 import React from 'react'
 import Link from 'gatsby-link'
+import { connect } from 'react-redux';
 
-const Header = ({ siteTitle }) => (
+const Header = (props) => (
   <div
     style={{
       background: 'rebeccapurple',
@@ -13,6 +14,9 @@ const Header = ({ siteTitle }) => (
         margin: '0 auto',
         maxWidth: 1240,
         padding: '1.45rem 1.0875rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
       }}
     >
       <h1 style={{ margin: 0 }}>
@@ -23,11 +27,20 @@ const Header = ({ siteTitle }) => (
             textDecoration: 'none',
           }}
         >
-          {siteTitle}
+          {props.siteTitle}
         </Link>
       </h1>
+      <h2 style={{ margin: 0 }}>
+        Score: { props.board.players[props.board.activePlayer].score }
+      </h2>
     </div>
   </div>
 )
 
-export default Header
+function mapStateToProps(state) {
+  return {
+    board: state.board
+  }
+}
+
+export default connect(mapStateToProps)(Header);

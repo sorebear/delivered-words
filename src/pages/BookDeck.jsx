@@ -5,14 +5,18 @@ import Button from '../components/Button';
 import { 
   shuffleDiscardPile,
   revealBookDeckCard, 
+  playerDrawTopCard,
   playerTakeAvailableCard,
   discardBookCard,
+  obtainBook,
+  deliverBook,
   movePlayer
 } from '../actions';
 
 class BookDeck extends Component {
   constructor(props) {
     super(props);
+    this.obtainBook = this.obtainBook.bind(this);
   }
 
   componentDidMount() {
@@ -36,11 +40,11 @@ class BookDeck extends Component {
 
   isSpaceEnabled(space, index) {
     const { board } = this.props;
-    return (space.type === 'bookstore' && board.playerLocation[board.activePlayer] === null) ||
-    index === (board.playerLocation[board.activePlayer] + 1) % 8 ||
-    index === (board.playerLocation[board.activePlayer] + 2) % 8 ||
-    index === (board.playerLocation[board.activePlayer] + 3) % 8 ||
-    index === (board.playerLocation[board.activePlayer] + 4) % 8;
+    return (space.type === 'bookstore' && board.players[board.activePlayer].location === null) ||
+    index === (board.players[board.activePlayer].location + 1) % 8 ||
+    index === (board.players[board.activePlayer].location + 2) % 8 ||
+    index === (board.players[board.activePlayer].location + 3) % 8 ||
+    index === (board.players[board.activePlayer].location + 4) % 8;
   }
 
   renderBookstoreInfo(space) {
@@ -50,8 +54,8 @@ class BookDeck extends Component {
   }
 
   renderTownInfo(space) {
-    return space.genres.map((genre, genreIndex) => (
-      <li key={genreIndex}>{genre.type} ({genre.quantity})</li>
+    return Object.keys(space.genres).map((genre, genreIndex) => (
+      <li key={genreIndex}>{genre} ({space.genres[genre]})</li>
     ))
   }
 
@@ -99,6 +103,7 @@ class BookDeck extends Component {
 
   renderAvailableCards() {
     const { bookDeck, playerTakeAvailableCard } = this.props;
+    
     return Object.values(bookDeck.available).map((book, index) => {
       if (book) {
         return (
@@ -112,18 +117,30 @@ class BookDeck extends Component {
     })
   }
 
-  isPlayerCardEnabled(book) {
-    return (this.isCardInBookstore(book) || this.isThereAPair(book.typeId)) && this.isBookstoreSpace();
-  }
-
-  isCardInBookstore(book) {
-    const { spaces, playerLocation, activePlayer } = this.props.board;
-    return spaces[playerLocation[activePlayer]].genres.includes(book.type);
+  renderBooks() {
+    const { players, activePlayer } = this.props.board;
+    return players[activePlayer].inventory.map((book, index) => {
+      return (
+        <li key={index}>
+          <Button 
+            onClick={() => deliverBook(this.props.board, book, players[activePlayer].score, index)}
+            enabled={!this.isBookstoreSpace()}
+          >
+            {book.type}
+          </Button>
+        </li>
+      )
+    })
   }
 
   isBookstoreSpace() {
-    const { spaces, playerLocation, activePlayer } = this.props.board;
-    return spaces[playerLocation[activePlayer]].type === 'bookstore';
+    const { spaces, players, activePlayer } = this.props.board;
+    return spaces[players[activePlayer].location].type === 'bookstore';
+  }
+
+  isCardInBookstore(book) {
+    const { spaces, players, activePlayer } = this.props.board;
+    return spaces[players[activePlayer].location].genres.includes(book.type);
   }
 
   isThereAPair(typeId) {
@@ -131,8 +148,23 @@ class BookDeck extends Component {
     return bookDeck.handPlayer1.filter((book) => book.typeId === typeId).length >= 2
   }
 
+  isAvailableSpaceInInventory() {
+    const { players, activePlayer } = this.props.board;
+    return players[activePlayer].inventory.length < 4;
+  }
+
+  isPlayerCardEnabled(book) {
+    return this.isBookstoreSpace() && this.isAvailableSpaceInInventory() && (this.isCardInBookstore(book) || this.isThereAPair(book.typeId));
+  }
+
+  obtainBook(book, index) {
+    const { bookDeck, board, discardBookCard, obtainBook } = this.props;
+    discardBookCard(bookDeck, index);
+    obtainBook(board, book);
+  }
+
   renderPlayerCards() {
-    const { bookDeck, discardBookCard, board } = this.props;
+    const { bookDeck } = this.props;
     return bookDeck.handPlayer1.map((book, index) => {
       const enabled = this.isPlayerCardEnabled(book);
       const requirePair = this.isBookstoreSpace() && !this.isCardInBookstore(book) && this.isThereAPair(book.typeId);
@@ -141,7 +173,7 @@ class BookDeck extends Component {
           <Button
             enabled={enabled}
             className={`player-card ${requirePair ? 'require-pair' : ''}`}
-            onClick={() => discardBookCard(bookDeck, index)}
+            onClick={() => this.obtainBook( book, index)}
           >
             {book.type}
           </Button>
@@ -172,11 +204,13 @@ class BookDeck extends Component {
             </ol>
             <h2>Player 1 Books</h2>
             <ol>
-
+              { this.renderBooks() }
             </ol>
           </div>
           <div className="card-stack">
-            <h2>Draw Deck</h2>
+            <button onClick={() => this.props.playerDrawTopCard(this.props.bookDeck) }>
+              <h2>Draw Deck</h2>
+            </button>
             <ol>
               { this.renderDrawDeck() }
             </ol>
@@ -203,7 +237,10 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, { 
   shuffleDiscardPile,
   revealBookDeckCard,
+  playerDrawTopCard,
   playerTakeAvailableCard,
   discardBookCard,
+  obtainBook,
+  deliverBook,
   movePlayer
 })(BookDeck);
