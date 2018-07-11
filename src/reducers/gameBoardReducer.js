@@ -18,8 +18,6 @@ export default (state = DEFAULT_STATE, action) => {
         players: action.payload.players
       }
     case (types.DELIVER_BOOK):
-      debugger;
-      console.log(`I AM DELIVERED:`, action.payload)
       return {
         ...state,
         players: action.payload.players

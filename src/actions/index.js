@@ -64,17 +64,15 @@ export function obtainBook(board, book) {
   }
 }
 
-export function deliverBook(board, book, currentScore, index) {
+export function deliverBook(board, book, index) {
   const { spaces, players, activePlayer } = board;
   const { location, score, inventory } = players[activePlayer];
-  // const score = parseInt(players[activePlayer].score);
   const newScore = spaces[location].genres.hasOwnProperty(book.type) ?
-    currentScore + spaces[location].genres[book.type] :
-    currentScore + 1
-  // const newPlayerObj = { score: newScore, location, inventory };
-  // players[activePlayer] = newPlayerObj;
+    score + spaces[location].genres[book.type] :
+    score + 1
   players[activePlayer].score = newScore;
-  console.log('PLAYERS:', players);
+  const deliveredBook = inventory.splice(index, 1);
+  players[activePlayer].deliveredBooks[location].push(deliveredBook[0]);
   return {
     type: types.DELIVER_BOOK,
     payload: { players }

@@ -59,12 +59,26 @@ class BookDeck extends Component {
     ))
   }
 
+  renderDeliveredBooks(spaceIndex) {
+    const { spaces, players, activePlayer } = this.props.board;
+    return players[activePlayer].deliveredBooks[spaceIndex].map((deliveredBook, index) => {
+      return (
+        <li key={deliveredBook.id}>{ deliveredBook.type }</li>
+      )
+    })
+  }
+
   renderBoard() {
     const { board, movePlayer } = this.props;
     return board.spaces.map((space, index) => {
       const enabled = this.isSpaceEnabled(space, index);
       return (
         <div key={space.id}>
+          <div>
+            <ol>
+              { space.type === 'town' ? this.renderDeliveredBooks(index) : ''}
+            </ol>
+          </div>
           <Button
             enabled={enabled}
             className={`game-space ${space.type}-space`}
@@ -118,12 +132,13 @@ class BookDeck extends Component {
   }
 
   renderBooks() {
+    const { deliverBook } = this.props;
     const { players, activePlayer } = this.props.board;
     return players[activePlayer].inventory.map((book, index) => {
       return (
         <li key={index}>
           <Button 
-            onClick={() => deliverBook(this.props.board, book, players[activePlayer].score, index)}
+            onClick={() => deliverBook(this.props.board, book, index)}
             enabled={!this.isBookstoreSpace()}
           >
             {book.type}
