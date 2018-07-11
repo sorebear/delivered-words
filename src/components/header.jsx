@@ -30,7 +30,7 @@ const Header = (props) => (
           {props.siteTitle}
         </Link>
       </h1>
-      <h2 style={{ margin: 0 }}>
+      <h2 style={{ margin: 0, color: 'white' }}>
         Score: { props.board.players[props.board.activePlayer].score }
       </h2>
     </div>

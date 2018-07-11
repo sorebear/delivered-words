@@ -1,0 +1,8 @@
+button {
+
+  &[disabled] {
+    img {
+      opacity: .5;
+    }
+  }
+}

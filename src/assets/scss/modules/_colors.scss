@@ -1,0 +1,23 @@
+$white: rgb(255, 255, 255);
+$lack: rgb(0, 0, 0);
+
+$slate: rgb(51, 51, 51);
+$brown: rgb(120, 68, 33);
+$red: rgb(212, 53, 38);
+$orange: rgb(243, 117, 36); 
+$yellow: rgb(226, 215, 57);
+$green: rgb(63, 173, 69);
+$teal: rgb(0, 128, 128);
+$purple: rgb(136, 63, 111);
+
+.mystery { background-color: $slate; border-color: lighten($slate, 20%) }
+.biography { background-color: $brown; border-color: lighten($brown, 20%) }
+.romance { background-color: $red; border-color: lighten($red, 20%) }
+.adventure { background-color: $orange; border-color: lighten($orange, 20%) }
+.drama { background-color: $yellow; border-color: lighten($yellow, 20%) }
+.horror { background-color: $green; border-color: lighten($green, 20%) }
+.fantasy { background-color: $teal; border-color: lighten($teal, 20%) }
+.sci-fi { background-color: $purple; border-color: lighten($purple, 20%) }
+
+
+

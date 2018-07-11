@@ -4,10 +4,16 @@
 
   .card-stack {
 
-    .player-card {
-
+    .player-card {    
+      
+      &:not(.require-pair) {
+        border-color: transparent;
+      }
       &.require-pair {
-        background-color: red;
+
+        &:not([disabled]) {
+          border-color: intial;
+        }
       }
     }
   }
