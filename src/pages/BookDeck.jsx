@@ -233,7 +233,6 @@ class BookDeck extends Component {
     console.log('THE PROPS:', this.props);
     return (
       <div>
-        <h2>Board</h2>
         <div className="game-spaces">
           {this.renderBoard()}
         </div>
